@@ -1,6 +1,7 @@
 
 
 from pathlib import Path
+from datetime import timedelta
 
 import environ
 env = environ.Env()
@@ -19,8 +20,7 @@ DEBUG = env.bool("DJANGO_DEBUG", False)
 
 # Application definition
 
-DJANGO_APPS = [
-    
+DJANGO_APPS = [ 
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -29,7 +29,13 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.admin",
 ]
-THIRD_PARTY_APPS = [ ] 
+THIRD_PARTY_APPS = [ 
+    "rest_framework",
+    "django_filters",
+    "djoser",
+    "rest_framework_simplejwt",
+    "corsheaders",
+] 
 LOCAL_APPS = [
     "core_apps.users",
     "core_apps.profiles",
@@ -137,6 +143,51 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "users.User"
+
+
+REST_FRAMEWORK = {
+    "EXCEPTION_HANDLER": "core_apps.common.exceptions.common_exception_handler",
+    "NON_FIELD_ERRORS_KEY": "error",
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+}
+
+SIMPLE_JWT = {
+    "AUTH_HEADER_TYPES": (
+        "Bearer",
+        "JWT",
+    ),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=999),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=999),
+    "SIGNING_KEY": env(
+        "SIGNING_KEY",
+        default="cTiizH79Hlcnjul35g9WKjFTV6pyZv1Ii0MovafqWzC5uJrUB9I",
+    ),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+}
+
+DJOSER = {
+    "LOGIN_FIELD": "username",
+    # "USER_CREATE_PASSWORD_RETYPE": True,
+    # "USERNAME_CHANGED_EMAIL_CONFIMATION": True,
+    # "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
+    # "SEND_CONFIRMATION_EMAIL": True,
+    "PASSWORD_RESET_CONFIRM_URL": "password/reset/confirm/{uid}/{token}",
+    "SET_PASSWORD_RETYPE": True,
+    "PASSWORD_RESET_CONFIRM_RETYPE": True,
+    # "USERNAME_RESET_CONFIRM_URL": "email/reset/confirm/{uid}/{token}",
+    # "ACTIVATION_URL": "activate/{uid}/{token}",
+    # "SEND_ACTIVATION_EMAIL": True,
+    "SERIALIZERS": {
+        # "user_create": "core_apps.users.serializers.CreateUserSerializer",
+        "user": "core_apps.users.serializers.UserSerializer",
+        # "current_user": "core_apps.users.serializers.UserSerializer",
+        # "user_delete": "djoser.serializers.UserDeleteSerializer",
+    },
+}
+
 
 LOGGING = {
     "version": 1,

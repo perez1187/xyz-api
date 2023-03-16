@@ -4,19 +4,30 @@ from . import models
 
 
 class ResultsAdmin(admin.ModelAdmin):
-    # list_display = ["club","player", "nickname"]
-    # list_display_links = ["club","player", "nickname"]
-    # list_filter = ["player", "nickname"]
-    list_display = ["nickname"]
-    list_display_links = ["nickname"]
-    list_filter = [ "nickname"]
+
+    list_display = [
+        "pk",
+        "nickname", 
+        "club", 
+        "reportId",
+        "profit_loss",
+        "rake","deal",
+        "rakeback",
+        "adjustment",
+        "agents",
+        "created_at",
+        "updated_at",
+        "description"
+        ]
+    list_display_links = ["pk"]
+    list_filter = ["reportId","nickname"]
 
 
 admin.site.register(models.Result, ResultsAdmin)
 
 class NicknameAdmin(admin.ModelAdmin):
-    list_display = ["club","player", "nickname"]
-    list_display_links = ["club","player", "nickname"]
+    list_display = ["player", "nickname","club","player_rb","player_adjustment"]
+    list_display_links = ["nickname"]
     list_filter = ["player", "nickname"]
 
 
@@ -29,3 +40,8 @@ class ClubAdmin(admin.ModelAdmin):
 
 
 admin.site.register(models.Club, ClubAdmin)
+
+class ReportIdAdmin(admin.ModelAdmin):
+    list_display = ["pk","date","description","created_at","updated_at"] # "created_at", "updated_at"
+    list_display_links = ["pk"]
+admin.site.register(models.ReportId,ReportIdAdmin)

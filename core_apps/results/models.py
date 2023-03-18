@@ -4,6 +4,8 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from datetime import datetime
 
+from pandas import DataFrame
+
 User = get_user_model()
 
 class ReportId(models.Model):
@@ -73,4 +75,13 @@ class Result(models.Model):
     # player = models.ForeignKey(Nickname,on_delete=models.CASCADE, verbose_name=_("Player"), related_name="Result_Player_Nickname", blank=True, null=True)
     # nickname = models.ForeignKey(Nickname,on_delete=models.CASCADE, verbose_name=_("Nickname"), related_name="Result_Nickname_Nickname", blank=True, null=True)
 
-  
+    # def __str__(self):
+    #     return 
+
+    # def result_dataframe(self) -> DataFrame:
+    #     """
+    #     Get all pricing data, as a Pandas DataFrame object, for a given Stock.
+    #     Returns:
+    #         Pandas DataFrame
+    #     """
+    #     return DataFrame.from_records(Quote.objects.filter(result=self).values())

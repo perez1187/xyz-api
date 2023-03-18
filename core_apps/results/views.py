@@ -2,7 +2,10 @@
     article:
         https://baronchibuike.medium.com/how-to-read-csv-file-and-save-the-content-to-the-database-in-django-rest-256c254ef722
 '''
-
+import pandas as pd
+import numpy as np 
+from pandas import Series, DataFrame
+import json
 
 from django.shortcuts import render
 from rest_framework import generics
@@ -15,8 +18,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth import get_user_model
 
 from .models import Nickname, Club,ReportId, Result
-from .serializers import FileUploadSerializer# SaveFileSerializer, ResultSerializer
-from .utils import checkClubExist, checkNicknameExist, newReportId, creatingNewResult
+from .serializers import FileUploadSerializer, ResultAdminSummarySerializer, ResultsSubmitSerializer #SaveFileSerializer
+from .utils import checkClubExist, checkNicknameExist, newReportId, creatingNewResult, calculateResults
 # from .filters import ResultFilter
 
 # from core_apps.nickname.models import Nickname
@@ -37,6 +40,14 @@ class UploadFileView(generics.CreateAPIView):
 
         reportName = newReportId() # creating new Report
 
+        qs = Result.objects.all().values() # with columns
+        all_results = pd.DataFrame(qs)
+        print(all_results)
+        
+        # qs2 = Result.objects.all().values_list() # without columns
+        # all_results2 = pd.DataFrame(qs2)
+        # print(all_results2)
+
         # adding results to Result table
         for _, row in reader.iterrows():   
 
@@ -48,14 +59,40 @@ class UploadFileView(generics.CreateAPIView):
             
             creatingNewResult(clubId,reportName,row) # add new result
 
-        return Response({"status": "success"},
+        return Response({"status":qs},
                         status.HTTP_201_CREATED)
 
-# class ResultListAPIView(generics.ListAPIView):
-#     serializer_class = ResultSerializer
-#     permission_classes = [permissions.IsAdminUser]
-#     queryset = Result.objects.all()
-#     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]    
-#     filterset_class = ResultFilter
+class ResultListAPIView(generics.ListAPIView):
+    serializer_class = ResultAdminSummarySerializer
+    permission_classes = [permissions.IsAdminUser]
+    queryset = Result.objects.all()
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]    
+    filterset_class = ResultFilter
 
-# class ResultUserAPIView(generics.RetrieveAPIView)
+
+class AdminResultsList(generics.ListAPIView):
+    
+    serializer_class = ResultAdminSummarySerializer
+    permission_classes = [permissions.IsAdminUser]
+
+
+    # overwriting query set
+    def get_queryset(self):
+        # https://www.django-rest-framework.org/api-guide/filtering/
+        queryset = Result.objects.all()
+        username = self.request.user
+        queryset = queryset.filter(nickname__player__username=username)
+
+        return queryset
+
+    # overwriting list (get request)
+    def list(self, request):
+         # Note the use of `get_queryset()` instead of `self.queryset`
+        queryset = self.get_queryset()     
+        serializer = ResultAdminSummarySerializer(queryset,many=True)
+
+        df = pd.DataFrame(serializer.data) # dataframe
+
+        allResults = calculateResults(df)
+
+        return Response({"playerResults" : allResults},status.HTTP_201_CREATED)

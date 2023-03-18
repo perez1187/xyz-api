@@ -2,6 +2,12 @@ from datetime import datetime
 
 from .models import Club, Nickname, ReportId, Result
 
+import pandas as pd
+import numpy as np 
+from pandas import Series, DataFrame
+import json
+
+
 def newReportId():
     reportName = str(datetime.now())
     newReport = ReportId(
@@ -73,3 +79,20 @@ def creatingNewResult(clubId,reportName,row):
         agent_settlement=row["AGENT SETTLEMENT"],
     )
     new_result.save()
+
+
+def calculateResults(df) :
+
+    df['profit_loss'] = pd.to_numeric(df['profit_loss'])
+    df['rake'] = pd.to_numeric(df['rake'])
+
+    playerResult = df.groupby(['nickname','club'])['profit_loss','rake'].sum()
+    df2 = playerResult.to_json(orient ='index') #'values'
+    # print(playerResult)
+    # print(json.loads(df2))
+
+    playerResultsGrouped = df.groupby(['nickname','club']).agg({'profit_loss':'sum','rake':'sum','player_rb':'mean','player_adjustment':'mean'})
+    df3 = playerResultsGrouped.to_json(orient ='index')
+    print(playerResultsGrouped)
+    allTempResults = json.loads(df3)
+    return allTempResults    

@@ -70,10 +70,10 @@ class ResultListAPIView(generics.ListAPIView):
     filterset_class = ResultFilter
 
 
-class AdminResultsList(generics.ListAPIView):
+class PlayerResults(generics.ListAPIView):
     
     serializer_class = ResultAdminSummarySerializer
-    permission_classes = [permissions.IsAdminUser]
+    # permission_classes = [permissions.IsAdminUser]
 
 
     # overwriting query set
@@ -81,7 +81,12 @@ class AdminResultsList(generics.ListAPIView):
         # https://www.django-rest-framework.org/api-guide/filtering/
         queryset = Result.objects.all()
         username = self.request.user
+        reportId = self.request.query_params.get('reportId')
+
         queryset = queryset.filter(nickname__player__username=username)
+
+        if reportId is not None:
+            queryset = queryset.filter(reportId__pk=reportId)  
 
         return queryset
 
@@ -93,6 +98,47 @@ class AdminResultsList(generics.ListAPIView):
 
         df = pd.DataFrame(serializer.data) # dataframe
 
-        allResults = calculateResults(df)
+        try:
+            allResults = calculateResults(df)
+        except:
+            return Response({"Results":"no results"},status.HTTP_200_OK)
 
         return Response({"playerResults" : allResults},status.HTTP_201_CREATED)
+
+class AdminResultsView(generics.ListAPIView):
+    
+    serializer_class = ResultAdminSummarySerializer
+    permission_classes = [permissions.IsAdminUser]
+
+
+    # overwriting query set
+    def get_queryset(self):
+        # https://www.django-rest-framework.org/api-guide/filtering/
+        queryset = Result.objects.all()
+        username =   self.request.query_params.get('username')
+        reportId = self.request.query_params.get('reportId')
+        
+        if username is not None:
+            queryset = queryset.filter(nickname__player__username=username)
+
+        if reportId is not None:
+            queryset = queryset.filter(reportId__pk=reportId)  
+             
+        # print("uuuuuuuuuuuuuuuuuuuuuuuuser",username)
+        # print(queryset)
+
+        return queryset
+
+    # overwriting list (get request)
+    def list(self, request):
+         # Note the use of `get_queryset()` instead of `self.queryset`
+        queryset = self.get_queryset()     
+        serializer = ResultAdminSummarySerializer(queryset,many=True)
+
+        df = pd.DataFrame(serializer.data) # dataframe
+
+        try:
+            allResults = calculateResults(df)
+        except:
+            return Response({"Results":"no results"},status.HTTP_200_OK)
+        return Response({"Results" : allResults},status.HTTP_200_OK)

@@ -86,13 +86,26 @@ def calculateResults(df) :
     df['profit_loss'] = pd.to_numeric(df['profit_loss'])
     df['rake'] = pd.to_numeric(df['rake'])
 
-    playerResult = df.groupby(['nickname','club'])['profit_loss','rake'].sum()
-    df2 = playerResult.to_json(orient ='index') #'values'
+    # playerResult = df.groupby(['nickname','club'])['profit_loss','rake'].sum()
+    # df2 = playerResult.to_json(orient ='index') #'values'
     # print(playerResult)
     # print(json.loads(df2))
 
-    playerResultsGrouped = df.groupby(['nickname','club']).agg({'profit_loss':'sum','rake':'sum','player_rb':'mean','player_adjustment':'mean'})
+    playerResultsGrouped = df.groupby(
+            [
+                'nickname',
+                'club'
+                ]
+        ).agg(
+            {
+                'profit_loss':'sum',
+                'rake':'sum',
+                'player_rb':'mean',
+                'player_adjustment':'mean'
+                })
+
     df3 = playerResultsGrouped.to_json(orient ='index')
-    print(playerResultsGrouped)
+    # print(playerResultsGrouped)
+    
     allTempResults = json.loads(df3)
     return allTempResults    

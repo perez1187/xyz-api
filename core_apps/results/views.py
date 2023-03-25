@@ -22,6 +22,7 @@ from django.contrib.auth import get_user_model
 from .models import Nickname, Club,ReportId, Result
 from .serializers import FileUploadSerializer, ResultAdminSummarySerializer, ResultsSubmitSerializer #SaveFileSerializer
 from .utils import checkClubExist, checkNicknameExist, newReportId, creatingNewResult, calculateClubResults, calculateResultsAdminV, calculateResultsPlayerV
+from .utils import checkNicknameExistNick
 # from .filters import ResultFilter
 
 # from core_apps.nickname.models import Nickname
@@ -63,6 +64,40 @@ class UploadFileView(generics.CreateAPIView):
 
         return Response({"status":qs},
                         status.HTTP_201_CREATED)
+
+class UploadNicknames(generics.CreateAPIView):
+    
+    permission_classes = [permissions.IsAdminUser,]
+    serializer_class = FileUploadSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        file = serializer.validated_data['file']
+
+        reader = pd.read_csv(file)
+
+        print(reader)
+
+        for _, row in reader.iterrows():   
+
+            club = row["club"]
+            nickname = row["nickname"]
+            user = row["user"]
+            player_TestRb = row["rb"]
+            player_Testadjustment = row["adjustment"]
+
+
+
+            clubId = checkClubExist(club) # check if club exist or create new club            
+            checkNicknameExistNick(nickname, clubId, club, user, player_TestRb, player_Testadjustment) # check if nick exists or create new Nick
+            
+            # creatingNewResult(clubId,reportName,row) # add new result
+
+
+        return Response({"status":"ok"},
+                status.HTTP_201_CREATED)
+
 
 class ResultListAPIView(generics.ListAPIView):
     serializer_class = ResultAdminSummarySerializer

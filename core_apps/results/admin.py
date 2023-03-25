@@ -26,7 +26,7 @@ class ResultsAdmin(admin.ModelAdmin):
 admin.site.register(models.Result, ResultsAdmin)
 
 class NicknameAdmin(admin.ModelAdmin):
-    list_display = ["player", "nickname","club","player_rb","player_adjustment"]
+    list_display = ["pk","player", "nickname","club","player_rb","player_adjustment"]
     list_display_links = ["nickname"]
     list_filter = ["player", "nickname"]
 

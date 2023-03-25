@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.db.models import Count, Sum
+from django.contrib.auth import get_user_model
 
 from .models import Club, Nickname, ReportId, Result
 
@@ -8,6 +9,7 @@ import numpy as np
 from pandas import Series, DataFrame
 import json
 
+User = get_user_model()
 
 def newReportId():
     reportName = str(datetime.now())
@@ -24,11 +26,11 @@ def checkClubExist(club):
     
     if Club.objects.filter(club=club).exists():
         clubId = Club.objects.get(club=club).pk
-        # print("jest", clubId)
+        print("jest", clubId)
         return clubId
     else:
         # save a new club
-        # print("nie ma")
+        print("nie ma clubu")
         new_club = Club(
             club=club
         )
@@ -53,6 +55,42 @@ def checkNicknameExist(nickname, clubId, club):
                 # player = 5
             )
             new_nickname.save()
+            return
+
+# method for adding existing nicknames
+def checkNicknameExistNick(nickname, clubId, club, user, player_TestRb, player_adjustment):
+        
+        if Nickname.objects.filter(nickname = nickname,club=clubId).exists():
+            print("Nick istnieje")
+            return
+
+        else:
+            # print("Nicka nie ma")
+
+            if User.objects.filter(pkid = user).exists():
+                print("mogę zapisac nick: " + nickname + "from user: " + str(user))
+                            # save nick
+                new_nickname = Nickname(
+                    nickname = nickname,
+                    club=Club.objects.get(club=club),
+                    player = User.objects.get(pk=user),
+                    player_rb=player_TestRb,
+                    player_adjustment=player_adjustment
+                )
+                new_nickname.save()
+
+            else:
+                print(" NIEEE nick " + nickname + "bo user " + str(user))
+                print(type(player_TestRb) )
+                # save nick
+                new_nickname = Nickname(
+                    nickname = nickname,
+                    club=Club.objects.get(club=club),
+                    player = User.objects.get(pk=2),
+                    player_rb=player_TestRb,
+                    player_adjustment=player_adjustment
+                )
+                new_nickname.save()
             return
 
 # def creatingNewResult(nickname,clubId,reportName,club, agents,profit_loss,rake,deal,rakeback,adjustment,agent_settlement):

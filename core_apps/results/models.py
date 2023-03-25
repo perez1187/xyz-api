@@ -15,7 +15,7 @@ class ReportId(models.Model):
     description = models.CharField(verbose_name=_("Description"), max_length=1024, default="", null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    date = models.DateTimeField(verbose_name=_("Date: mon-sund"),default=datetime.now)
+    date = models.DateField()
 
     # here add report date (week from to)
     def __str__(self):

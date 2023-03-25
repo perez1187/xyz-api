@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.db.models import Count, Sum
 
 from .models import Club, Nickname, ReportId, Result
 
@@ -80,32 +81,71 @@ def creatingNewResult(clubId,reportName,row):
     )
     new_result.save()
 
+# .values -> show values, that will be shown, we can use multiple value .values('club__club', 'nickname')
+# using __ (club__club) we can see str representation, otherwise we see ID
+# .order_by is filtering, we can filter multiple fields, and we can create subquries
+# . annotate, like in pivot table, we show results
+# queryset is from def get_queryset()
+# https://stackoverflow.com/questions/66819636/how-to-add-a-second-annotation-to-an-already-annotated-queryset-with-django-mode
+# https://stackoverflow.com/questions/27180190/django-using-objects-values-and-get-foreignkey-data-in-template
+def calculateClubResults(queryset):
 
-def calculateResults(df) :
+    result= queryset.values(
+        'club__club', 
+        'nickname__nickname'
+    ).order_by(
+        'club',
+        'nickname'
+    ).annotate(
+        total_profit=Sum('profit_loss'),
+        total_rb=Sum('rake')
+        )
 
-    df['profit_loss'] = pd.to_numeric(df['profit_loss'])
-    df['rake'] = pd.to_numeric(df['rake'])
+    return result
 
-    # playerResult = df.groupby(['nickname','club'])['profit_loss','rake'].sum()
-    # df2 = playerResult.to_json(orient ='index') #'values'
-    # print(playerResult)
-    # print(json.loads(df2))
-
-    playerResultsGrouped = df.groupby(
-            [
-                'nickname',
-                'club'
-                ]
-        ).agg(
-            {
-                'profit_loss':'sum',
-                'rake':'sum',
-                'player_rb':'mean',
-                'player_adjustment':'mean'
-                })
-
-    df3 = playerResultsGrouped.to_json(orient ='index')
-    # print(playerResultsGrouped)
+# .values -> show values, that will be shown, we can use multiple value .values('club__club', 'nickname')
+# using __ (club__club) we can see str representation, otherwise we see ID
+# .order_by is filtering, we can filter multiple fields, and we can create subquries
+# . annotate, like in pivot table, we show results
+# queryset is from def get_queryset()
+# https://stackoverflow.com/questions/66819636/how-to-add-a-second-annotation-to-an-already-annotated-queryset-with-django-mode
+# https://stackoverflow.com/questions/27180190/django-using-objects-values-and-get-foreignkey-data-in-template
+def calculateResultsAdminV(queryset):
     
-    allTempResults = json.loads(df3)
-    return allTempResults    
+    result= queryset.values(
+        'nickname__player__username',
+        'nickname__nickname',
+        'club__club', 
+    ).order_by(
+        'club',
+        'nickname'
+    ).annotate(
+        total_profit=Sum('profit_loss'),
+        total_rb=Sum('rake')
+        )
+
+    return result
+
+# .values -> show values, that will be shown, we can use multiple value .values('club__club', 'nickname')
+# using __ (club__club) we can see str representation, otherwise we see ID
+# .order_by is filtering, we can filter multiple fields, and we can create subquries
+# . annotate, like in pivot table, we show results
+# queryset is from def get_queryset()
+# https://stackoverflow.com/questions/66819636/how-to-add-a-second-annotation-to-an-already-annotated-queryset-with-django-mode
+# https://stackoverflow.com/questions/27180190/django-using-objects-values-and-get-foreignkey-data-in-template
+def calculateResultsPlayerV(queryset):
+   
+    result= queryset.values(
+        'nickname__player__username',
+        'nickname__nickname',
+        'club__club', 
+        # 'reportId__date'
+    ).order_by(
+        'club',
+        'nickname'
+    ).annotate(
+        total_profit=Sum('profit_loss'),
+        total_rb=Sum('rake')
+        )
+
+    return result        

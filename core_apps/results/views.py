@@ -7,6 +7,8 @@ import numpy as np
 from pandas import Series, DataFrame
 import json
 
+from django.db.models import Count, Sum
+
 from django.shortcuts import render
 from rest_framework import generics
 import io, csv, pandas as pd
@@ -19,7 +21,7 @@ from django.contrib.auth import get_user_model
 
 from .models import Nickname, Club,ReportId, Result
 from .serializers import FileUploadSerializer, ResultAdminSummarySerializer, ResultsSubmitSerializer #SaveFileSerializer
-from .utils import checkClubExist, checkNicknameExist, newReportId, creatingNewResult, calculateResults
+from .utils import checkClubExist, checkNicknameExist, newReportId, creatingNewResult, calculateClubResults, calculateResultsAdminV, calculateResultsPlayerV
 # from .filters import ResultFilter
 
 # from core_apps.nickname.models import Nickname
@@ -69,76 +71,85 @@ class ResultListAPIView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]    
     filterset_class = ResultFilter
 
-
+# filter by:
+# reportDate=YYYY-MM-DD (always should be sunday)
 class PlayerResults(generics.ListAPIView):
-    
-    serializer_class = ResultAdminSummarySerializer
-    # permission_classes = [permissions.IsAdminUser]
-
 
     # overwriting query set
     def get_queryset(self):
         # https://www.django-rest-framework.org/api-guide/filtering/
         queryset = Result.objects.all()
         username = self.request.user
-        reportId = self.request.query_params.get('reportId')
+        reportDate = self.request.query_params.get('reportDate')
 
         queryset = queryset.filter(nickname__player__username=username)
 
-        if reportId is not None:
-            queryset = queryset.filter(reportId__pk=reportId)  
+        if reportDate is not None:
+            queryset = queryset.filter(reportId__date=reportDate)  
 
         return queryset
 
     # overwriting list (get request)
     def list(self, request):
-         # Note the use of `get_queryset()` instead of `self.queryset`
+
         queryset = self.get_queryset()     
-        serializer = ResultAdminSummarySerializer(queryset,many=True)
 
-        df = pd.DataFrame(serializer.data) # dataframe
+        results = calculateResultsPlayerV(queryset)
 
-        try:
-            allResults = calculateResults(df)
-        except:
-            return Response({"Results":"no results"},status.HTTP_200_OK)
+        return Response({"playerResults" : results},status.HTTP_201_CREATED)
 
-        return Response({"playerResults" : allResults},status.HTTP_201_CREATED)
-
+# filter by:
+# reportDate=YYYY-MM-DD (always should be sunday)
+# username=username
 class AdminResultsView(generics.ListAPIView):
-    
-    serializer_class = ResultAdminSummarySerializer
-    permission_classes = [permissions.IsAdminUser]
 
+    permission_classes = [permissions.IsAdminUser]
 
     # overwriting query set
     def get_queryset(self):
         # https://www.django-rest-framework.org/api-guide/filtering/
         queryset = Result.objects.all()
         username =   self.request.query_params.get('username')
-        reportId = self.request.query_params.get('reportId')
+        reportDate = self.request.query_params.get('reportDate')
         
         if username is not None:
             queryset = queryset.filter(nickname__player__username=username)
 
-        if reportId is not None:
-            queryset = queryset.filter(reportId__pk=reportId)  
-             
-        # print("uuuuuuuuuuuuuuuuuuuuuuuuser",username)
-        # print(queryset)
+        if reportDate is not None:
+            queryset = queryset.filter(reportId__date=reportDate)  
 
         return queryset
 
     # overwriting list (get request)
     def list(self, request):
-         # Note the use of `get_queryset()` instead of `self.queryset`
+
         queryset = self.get_queryset()     
-        serializer = ResultAdminSummarySerializer(queryset,many=True)
 
-        df = pd.DataFrame(serializer.data) # dataframe
+        results = calculateResultsAdminV(queryset)
 
-        try:
-            allResults = calculateResults(df)
-        except:
-            return Response({"Results":"no results"},status.HTTP_200_OK)
-        return Response({"Results" : allResults},status.HTTP_200_OK)
+        return Response({"Results" : results},status.HTTP_200_OK)
+
+# filter by:
+# reportDate=YYYY-MM-DD (always should be sunday)
+class ClubResultsAdminView(generics.ListAPIView):
+    
+    permission_classes = [permissions.IsAdminUser,]
+
+    def get_queryset(self):
+
+        queryset = Result.objects.all()
+
+        reportDate = self.request.query_params.get('reportDate')
+
+        if reportDate is not None:
+            queryset = queryset.filter(reportId__date=reportDate)  
+
+        return queryset
+
+    def list(self, request):
+
+        queryset = self.get_queryset()
+
+        results = calculateClubResults(queryset)
+
+        return Response({"ClubResults" : results},status.HTTP_200_OK) 

@@ -1,5 +1,5 @@
 from datetime import datetime
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Avg
 from django.contrib.auth import get_user_model
 
 from .models import Club, Nickname, ReportId, Result
@@ -183,7 +183,9 @@ def calculateResultsPlayerV(queryset):
         'nickname'
     ).annotate(
         total_profit=Sum('profit_loss'),
-        total_rb=Sum('rake')
+        total_rb=Sum('rake'),
+        avg_rb = Avg('nickname__player_rb'),
+        avg_adj = Avg('nickname__player_adjustment')
         )
 
     return result        

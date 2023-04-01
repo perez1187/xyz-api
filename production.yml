@@ -11,11 +11,11 @@ services:
             - ./.envs/.production/.django
             - ./.envs/.production/.postgres
 
-#         networks:
-#             - reverseproxy-nw
+        networks:
+            - reverseproxy-nw
 
 
 
-# networks:
-#     reverseproxy-nw:
-#         external: true
+networks:
+    reverseproxy-nw:
+        external: true

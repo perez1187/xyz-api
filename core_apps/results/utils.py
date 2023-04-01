@@ -130,10 +130,8 @@ def calculateClubResults(queryset):
 
     result= queryset.values(
         'club__club', 
-        'nickname__nickname'
     ).order_by(
         'club',
-        'nickname'
     ).annotate(
         total_profit=Sum('profit_loss'),
         total_rb=Sum('rake')
@@ -159,7 +157,11 @@ def calculateResultsAdminV(queryset):
         'nickname'
     ).annotate(
         total_profit=Sum('profit_loss'),
-        total_rb=Sum('rake')
+        total_rb=Sum('rake'),
+        avg_rb = Avg('nickname__player_rb'),
+        avg_adj = Avg('nickname__player_adjustment'),
+        avg_club_rb = Avg('club__player_rb'),
+        avg_club_adj = Avg('club__player_adjustment')
         )
 
     return result
@@ -185,7 +187,8 @@ def calculateResultsPlayerV(queryset):
         total_profit=Sum('profit_loss'),
         total_rb=Sum('rake'),
         avg_rb = Avg('nickname__player_rb'),
-        avg_adj = Avg('nickname__player_adjustment')
+        avg_adj = Avg('nickname__player_adjustment'),
+        
         )
 
     return result        

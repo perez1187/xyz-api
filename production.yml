@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+    api: &api
+        build:
+            context: .
+            dockerfile: ./docker/production/django/Dockerfile
+        command: /start
+        image: aff-api
+        env_file:
+            - ./.envs/.production/.django
+            - ./.envs/.production/.postgres
+
+#         networks:
+#             - reverseproxy-nw
+
+
+
+# networks:
+#     reverseproxy-nw:
+#         external: true

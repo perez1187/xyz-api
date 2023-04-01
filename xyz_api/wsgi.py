@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "xyz_api.settings.local") # we have to change in prod
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "xyz_api.settings.production") # we have to change in prod
 
 application = get_wsgi_application()

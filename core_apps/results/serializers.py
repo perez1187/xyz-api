@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Result
+from .models import Result,ReportId
 
 class FileUploadSerializer(serializers.Serializer):
     file = serializers.FileField()
@@ -34,3 +34,11 @@ class ResultsSubmitSerializer(serializers.ModelSerializer):
     class Meta:
         model = Result
         fields = ("player",)
+
+class ReportsListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReportId
+        fields = [
+            "id",            
+            "date",
+        ]

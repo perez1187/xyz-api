@@ -20,7 +20,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth import get_user_model
 
 from .models import Nickname, Club,ReportId, Result
-from .serializers import FileUploadSerializer, ResultAdminSummarySerializer, ResultsSubmitSerializer #SaveFileSerializer
+from .serializers import FileUploadSerializer, ResultAdminSummarySerializer, ResultsSubmitSerializer, ReportsListSerializer #SaveFileSerializer
 from .utils import checkClubExist, checkNicknameExist, newReportId, creatingNewResult, calculateClubResults, calculateResultsAdminV, calculateResultsPlayerV
 from .utils import checkNicknameExistNick
 # from .filters import ResultFilter
@@ -188,3 +188,9 @@ class ClubResultsAdminView(generics.ListAPIView):
         results = calculateClubResults(queryset)
 
         return Response({"ClubResults" : results},status.HTTP_200_OK) 
+
+# create report list for logged in users
+class ReportsListView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated,]
+    queryset = ReportId.objects.all()
+    serializer_class = ReportsListSerializer

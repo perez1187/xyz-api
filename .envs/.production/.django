@@ -1,0 +1,10 @@
+DJANGO_SETTINGS_MODULE=xyz_api.settings.production
+DJANGO_SECRET_KEY=RZOLRPXO4CoPkvo1wyH0tbGcT6jTG0PaDzAvtUFX6lTEbILrxgPJ3Lnb3m6dZk0a
+
+DJANGO_ADMIN_URL=admin/
+
+DJANGO_ALLOWED_HOSTS=www.yyy.dsgaff.com,164.90.162.15,yyy.dsgaff.com,xyz.dsgaff.com,adminxyz.dsgadd.com,dsgaff.com,.dsgaff.com,206.189.51.192,localhost,127.0.0.1
+
+DJANGO_SECURE_SSL_REDIRECT=False
+
+SIGNING_KEY=cTiizH79Hlcnjul35g9WKjFTV6pyZv1Ii0MovafqWzC5uJrUB9I

@@ -8,6 +8,7 @@ urlpatterns = [
     path("api/v1/auth/", include("djoser.urls.jwt")),
     path("api/v1/results/", include("core_apps.results.urls")),
     path("api/v1/settlement/", include("core_apps.settlement.urls")),
+    path("api/v1/users/", include("core_apps.users.urls")),
 ]
 
 admin.site.site_header = "Settlements"

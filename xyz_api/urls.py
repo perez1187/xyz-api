@@ -11,6 +11,6 @@ urlpatterns = [
     path("api/v1/users/", include("core_apps.users.urls")),
 ]
 
-admin.site.site_header = "Settlements"
-admin.site.site_title = "Settlements API Admin Portal"
-admin.site.index_title = "Settlements API Portal"
+admin.site.site_header = "Fish Hunters Portal"
+admin.site.site_title = "Fish Hunters Portal"
+admin.site.index_title = "Fish Hunters Portal"

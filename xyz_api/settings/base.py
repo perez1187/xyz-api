@@ -128,13 +128,8 @@ ADMINS = [("""xyz""", "xyz@gmail.com")]
 MANAGERS = ADMINS
 
 CORS_URLS_REGEX = r"^/api/.*$" # so we waneted to allow only inputs from /api/
-CORS_ALLOWED_ORIGINS = [
-    "https://example.com",
-    "https://sub.example.com",
-    "http://localhost:8080",
-    "http://127.0.0.1:9000",
-    "http://localhost:3000",
-]
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

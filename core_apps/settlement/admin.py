@@ -17,16 +17,10 @@ class SettlementAdmin(admin.ModelAdmin):
 
 admin.site.register(models.Settlement, SettlementAdmin)
 
+class CurrencyAdmin(admin.ModelAdmin):
+    list_display = [
+        'currency',
+    ]
+    list_display_links = ['currency']
 
-''' 
-zaladowac dane, tak aby pracowac na orginalnych danych, w tym zaladowac userow
-
-stworzyc prosty front dla usera
-stworzyc prosty front dla admina
-
-opublikowac backend
-opublikowac front
-
-stworzyc nowy branch i nowa testowa baze
-
-'''
+admin.site.register(models.Currency, CurrencyAdmin)    

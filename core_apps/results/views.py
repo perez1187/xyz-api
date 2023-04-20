@@ -22,7 +22,7 @@ from django.contrib.auth import get_user_model
 from .models import Nickname, Club,ReportId, Result
 from .serializers import FileUploadSerializer, ResultAdminSummarySerializer, ResultsSubmitSerializer, ReportsListSerializer #SaveFileSerializer
 from .utils import checkClubExist, checkNicknameExist, newReportId, creatingNewResult, calculateClubResults, calculateResultsAdminV, calculateResultsPlayerV
-from .utils import checkNicknameExistNick
+from .utils import checkNicknameExistNick, creatingNewResultPDeals
 # from .filters import ResultFilter
 
 # from core_apps.nickname.models import Nickname
@@ -31,6 +31,7 @@ from .filters import ResultFilter
 
 User = get_user_model()
 
+# DSG reports
 class UploadFileView(generics.CreateAPIView):
     permission_classes = [permissions.IsAdminUser,]
     serializer_class = FileUploadSerializer
@@ -43,13 +44,11 @@ class UploadFileView(generics.CreateAPIView):
 
         reportName = newReportId() # creating new Report
 
+        affAgentId = 1 # dsg id
+
         qs = Result.objects.all().values() # with columns
         all_results = pd.DataFrame(qs)
         print(all_results)
-        
-        # qs2 = Result.objects.all().values_list() # without columns
-        # all_results2 = pd.DataFrame(qs2)
-        # print(all_results2)
 
         # adding results to Result table
         for _, row in reader.iterrows():   
@@ -57,14 +56,48 @@ class UploadFileView(generics.CreateAPIView):
             club = row["CLUB"]
             nickname = row["NICKNAME"]
 
-            clubId = checkClubExist(club) # check if club exist or create new club            
-            checkNicknameExist(nickname, clubId, club) # check if nick exists or create new Nick
+            clubId = checkClubExist(club,affAgentId) # check if club exist or create new club            
+            checkNicknameExist(nickname, clubId, club,affAgentId) # check if nick exists or create new Nick
             
-            creatingNewResult(clubId,reportName,row) # add new result
+            creatingNewResult(clubId,reportName,row,affAgentId) # add new result
 
         return Response({"status":qs},
                         status.HTTP_201_CREATED)
 
+# Pdeals reports
+class UploadFilePDealsView(generics.CreateAPIView):
+    permission_classes = [permissions.IsAdminUser,]
+    serializer_class = FileUploadSerializer
+    
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        file = serializer.validated_data['file']
+        reader = pd.read_csv(file)
+
+        reportName = newReportId() # creating new Report
+
+        affAgentId = 2 # pdeals id
+
+        qs = Result.objects.all().values() # with columns
+        all_results = pd.DataFrame(qs)
+        print(all_results)
+
+        # adding results to Result table
+        for _, row in reader.iterrows():   
+
+            club = row["Club"]
+            nickname = row["Nickname"]
+
+            clubId = checkClubExist(club,affAgentId) # check if club exist or create new club            
+            checkNicknameExist(nickname, clubId, club,affAgentId) # check if nick exists or create new Nick
+            
+            creatingNewResultPDeals(clubId,reportName,row,affAgentId) # add new result
+
+        return Response({"status":qs},
+                        status.HTTP_201_CREATED)                        
+
+# as default affAgent ID = 1
 class UploadNicknames(generics.CreateAPIView):
     
     permission_classes = [permissions.IsAdminUser,]
@@ -79,6 +112,8 @@ class UploadNicknames(generics.CreateAPIView):
 
         print(reader)
 
+        affAgentId = 1 # dsg id
+
         for _, row in reader.iterrows():   
 
             club = row["club"]
@@ -89,7 +124,7 @@ class UploadNicknames(generics.CreateAPIView):
 
 
 
-            clubId = checkClubExist(club) # check if club exist or create new club            
+            clubId = checkClubExist(club,affAgentId) # check if club exist or create new club            
             checkNicknameExistNick(nickname, clubId, club, user, player_TestRb, player_Testadjustment) # check if nick exists or create new Nick
             
             # creatingNewResult(clubId,reportName,row) # add new result

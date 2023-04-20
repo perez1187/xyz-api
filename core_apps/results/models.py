@@ -14,7 +14,7 @@ class ReportId(models.Model):
 #     pkid = models.BigAutoField(primary_key=True, editable=False)
 #     id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(verbose_name=_("Name"), max_length=100, default="")
-    description = models.CharField(verbose_name=_("Description"), max_length=1024, default="", null=False, blank=False)
+    description = models.CharField(verbose_name=_("Description"), max_length=1024, default="", null=False, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     date = models.DateField(default=datetime.date.today )
@@ -23,15 +23,26 @@ class ReportId(models.Model):
     def __str__(self):
         return f"{self.date}"[0:10]    
 
+class AffAgent(models.Model):
+    name = models.CharField(verbose_name=_("Aff Agent Name"), max_length=100, unique=False)
+    description = models.CharField(verbose_name=_("Description"), max_length=1024, default="", null=False, blank=True)
+    
+    def __str__(self):
+        return f"{self.name}"   
+
 
 class Club(models.Model):
     club = models.CharField(verbose_name=_("Club"), max_length=100, unique=False)
     player_rb = models.DecimalField(verbose_name=_("Aff Rakeback"),max_digits=10, decimal_places=3, null=False, blank=False, default=0.0)
     player_adjustment = models.DecimalField(verbose_name=_("Aff Adjustment"),max_digits=10, decimal_places=2, null=False, blank=False, default=0.0)
     is_active = models.BooleanField(verbose_name=_("Is Active"), default=True)
+    affAgent = models.ForeignKey(AffAgent, on_delete=models.CASCADE,verbose_name=_("aff agent"), blank= True, null=True)
 
     def __str__(self):
         return f"{self.club}"
+
+    class Meta:
+        unique_together = ('club', 'affAgent',)        
 
 class Nickname(models.Model):
     player = models.ForeignKey(

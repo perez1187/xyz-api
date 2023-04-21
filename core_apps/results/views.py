@@ -19,7 +19,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from django.contrib.auth import get_user_model
 
-from .models import Nickname, Club,ReportId, Result
+from .models import Nickname, Club,ReportId, Result, AffAgent
 from .serializers import FileUploadSerializer, ResultAdminSummarySerializer, ResultsSubmitSerializer, ReportsListSerializer #SaveFileSerializer
 from .utils import checkClubExist, checkNicknameExist, newReportId, creatingNewResult, calculateClubResults, calculateResultsAdminV, calculateResultsPlayerV
 from .utils import checkNicknameExistNick, creatingNewResultPDeals

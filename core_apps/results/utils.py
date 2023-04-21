@@ -2,7 +2,7 @@ from datetime import datetime
 from django.db.models import Count, Sum, Avg
 from django.contrib.auth import get_user_model
 
-from .models import Club, Nickname, ReportId, Result, AffAgent
+from .models import Club, Nickname, ReportId, Result
 
 import pandas as pd
 import numpy as np 
@@ -25,9 +25,10 @@ def newReportId():
 # as default affAgent id = 1
 def checkClubExist(club, affAgentId):
 
-    affAgent = AffAgent.objects.get(id=affAgentId)
+    # affAgent = AffAgent.objects.get(id=affAgentId)
     
-    if Club.objects.filter(club=club, affAgent=affAgentId).exists():
+    # if Club.objects.filter(club=club, affAgent=affAgentId).exists():
+    if Club.objects.filter(club=club).exists():
         clubId = Club.objects.get(club=club).pk
         print("jest", clubId)
         return clubId
@@ -40,13 +41,14 @@ def checkClubExist(club, affAgentId):
         )
         new_club.save()
 
-        clubId = Club.objects.get(club=club,affAgent=affAgentId).pk
+        clubId = Club.objects.get(club=club).pk
+        # clubId = Club.objects.get(club=club,affAgent=affAgentId).pk
         # print("saved",clubId)
         return clubId
 
 def checkNicknameExist(nickname, clubId, club, affAgentId):
 
-        affAgent = AffAgent.objects.get(id=affAgentId)
+        # affAgent = AffAgent.objects.get(id=affAgentId)
         
         if Nickname.objects.filter(nickname = nickname,club=clubId).exists():
             print("Nick istnieje")
@@ -58,7 +60,8 @@ def checkNicknameExist(nickname, clubId, club, affAgentId):
             # save nick
             new_nickname = Nickname(
                 nickname = nickname,
-                club=Club.objects.get(club=club,affAgent=affAgent),
+                # club=Club.objects.get(club=club,affAgent=affAgent),
+                club=Club.objects.get(club=club),
                 # player = 5
             )
             new_nickname.save()
@@ -112,11 +115,12 @@ def creatingNewResult(clubId,reportName,row,affAgentId):
     adjustment=row["ADJUSTMENT"]
     agent_settlement=row["AGENT SETTLEMENT"]
 
-    affAgent = AffAgent.objects.get(id=affAgentId)
+    # affAgent = AffAgent.objects.get(id=affAgentId)
     
     new_result = Result(
         nickname=Nickname.objects.get(nickname = nickname,club=clubId),
         reportId=ReportId.objects.get(name=reportName),
+        # club= Club.objects.get(club=club,affAgent=affAgent),
         club= Club.objects.get(club=club,affAgent=affAgent),
         agents=agents,
         profit_loss=profit_loss,
@@ -139,13 +143,14 @@ def creatingNewResultPDeals(clubId,reportName,row,affAgentId):
     adjustment=row["Action USD"]
     agent_settlement=row["Total"]
 
-    affAgent = AffAgent.objects.get(id=affAgentId)
+    # affAgent = AffAgent.objects.get(id=affAgentId)
     deal = rakeback / rake
     
     new_result = Result(
         nickname=Nickname.objects.get(nickname = nickname,club=clubId),
         reportId=ReportId.objects.get(name=reportName),
-        club= Club.objects.get(club=club,affAgent=affAgent),
+        # club= Club.objects.get(club=club,affAgent=affAgent),
+        club= Club.objects.get(club=club),
         agents=agents,
         profit_loss=profit_loss,
         rake=rake,

@@ -34,7 +34,7 @@ class NicknameAdmin(admin.ModelAdmin):
 admin.site.register(models.Nickname, NicknameAdmin)
 
 class ClubAdmin(admin.ModelAdmin):
-    list_display = ["club","affAgent","player_rb","player_adjustment","is_active"]
+    list_display = ["pk","club","affAgent","player_rb","player_adjustment","is_active"]
     # list_display = ["club","player_rb","player_adjustment","is_active"]
     # list_display = ["club"]
     list_display_links = ["club"]

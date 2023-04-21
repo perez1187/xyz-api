@@ -23,13 +23,16 @@ def newReportId():
 
 
 # as default affAgent id = 1
+# when you uplaod nickanmes you need ID
+# when upload results, name
 def checkClubExist(club, affAgentId):
 
     affAgent = AffAgent.objects.get(id=affAgentId)
+    # clubName = Club.objects.get(id=club)
     
+    # if Club.objects.filter(club=clubName, affAgent=affAgentId).exists():
     if Club.objects.filter(club=club, affAgent=affAgentId).exists():
-    # if Club.objects.filter(club=club).exists():
-        clubId = Club.objects.get(club=club).pk
+        clubId = Club.objects.get(club=club,affAgent=affAgentId).pk
         print("jest", clubId)
         return clubId
     else:
@@ -82,7 +85,8 @@ def checkNicknameExistNick(nickname, clubId, club, user, player_TestRb, player_a
                             # save nick
                 new_nickname = Nickname(
                     nickname = nickname,
-                    club=Club.objects.get(club=club),
+                    # club=Club.objects.get(club=club),
+                    club=Club.objects.get(pk=club),
                     player = User.objects.get(pk=user),
                     player_rb=player_TestRb,
                     player_adjustment=player_adjustment

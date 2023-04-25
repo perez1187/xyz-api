@@ -49,6 +49,33 @@ def checkClubExist(club, affAgentId):
         # print("saved",clubId)
         return clubId
 
+# as default affAgent id = 1
+# when you uplaod nickanmes you need ID
+# when upload results, name
+def checkClubExistManualyNicknames(club, affAgentId):
+
+    affAgent = AffAgent.objects.get(id=affAgentId)
+    # clubName = Club.objects.get(id=club)
+    
+    # if Club.objects.filter(club=clubName, affAgent=affAgentId).exists():
+    if Club.objects.filter(club=club, affAgent=affAgentId).exists():
+        clubId = Club.objects.get(club=club,affAgent=affAgentId).pk
+        print("jest", clubId)
+        return clubId
+    else:
+        # save a new club
+        print("nie ma clubu")
+        new_club = Club(
+            club=club,
+            affAgent=affAgent
+        )
+        new_club.save()
+
+        # clubId = Club.objects.get(club=club).pk
+        clubId = Club.objects.get(club=club,affAgent=affAgentId).pk
+        # print("saved",clubId)
+        return clubId
+
 def checkNicknameExist(nickname, clubId, club, affAgentId):
 
         affAgent = AffAgent.objects.get(id=affAgentId)

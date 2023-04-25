@@ -22,7 +22,7 @@ from django.contrib.auth import get_user_model
 from .models import Nickname, Club,ReportId, Result, AffAgent
 from .serializers import FileUploadSerializer, ResultAdminSummarySerializer, ResultsSubmitSerializer, ReportsListSerializer #SaveFileSerializer
 from .utils import checkClubExist, checkNicknameExist, newReportId, creatingNewResult, calculateClubResults, calculateResultsAdminV, calculateResultsPlayerV
-from .utils import checkNicknameExistNick, creatingNewResultPDeals
+from .utils import checkNicknameExistNick, creatingNewResultPDeals, checkClubExistManualyNicknames
 # from .filters import ResultFilter
 
 # from core_apps.nickname.models import Nickname
@@ -124,7 +124,7 @@ class UploadNicknames(generics.CreateAPIView):
 
 
 
-            clubId = checkClubExist(club,affAgentId) # check if club exist or create new club            
+            clubId = checkClubExistManualyNicknames(club,affAgentId) # check if club exist or create new club            
             checkNicknameExistNick(nickname, clubId, club, user, player_TestRb, player_Testadjustment) # check if nick exists or create new Nick
             
             # creatingNewResult(clubId,reportName,row) # add new result
